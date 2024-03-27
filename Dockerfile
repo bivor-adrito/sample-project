@@ -1,11 +1,35 @@
-FROM node:16.15-alpine3.15
+FROM node:16.15-alpine3.15 As development
 
-WORKDIR /code
+WORKDIR /usr/src/app-server
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --ignore-scripts --only=development
 
 COPY . .
 
-CMD npm run start:dev
+RUN npm run build
+
+FROM node:16.15-alpine3.15 As production
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /usr/src/app-server
+
+COPY package*.json ./
+
+RUN npm install --ignore-scripts --only=production
+
+COPY . .
+
+COPY --from=development /usr/src/app-server/dist ./dist
+
+#api port
+EXPOSE 9000
+
+#socket port
+# EXPOSE 3003
+
+CMD ["node", "dist/main"]
+
