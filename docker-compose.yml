@@ -5,15 +5,21 @@ networks:
         external: true
 
 services:
-    backend:
+    sample_backend:
         image: 'node:16.15-alpine3.15'
-        container_name: backend
+        container_name: sample_backend
         restart: unless-stopped
         build:
             context: .
             dockerfile: Dockerfile
         ports:
             - '9000:9000'
-            # - '3003:3003'
         networks:
             - global_network
+
+    # redis:
+    #   image: 'redis:alpine'
+    #   ports:
+    #     - 6379:6379
+    #   networks:
+    #     - global_network
